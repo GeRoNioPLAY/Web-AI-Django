@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Редактировать книгу</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'books/styles.css' %}">
+</head>
+<body>
+    <h1>Данные о книге</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="add_btn">Сохранить</button>
+    </form>
+    <a href="{% url 'list' %}">Вернуться к списку</a>
+</body>
+</html>

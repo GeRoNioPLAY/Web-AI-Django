@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список книг</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'books/styles.css' %}">
+</head>
+<body>
+    <h1>Список книг</h1>
+    <div class="add_btn">
+        <a href="{% url 'add_book' %}">Добавить новую книгу</a>
+    </div>
+    <ul>
+        {% for book in page_obj %}
+            <li>
+                {{ book.title }} от {{ book.author }}; Цена: {{ book.price }}.
+                <div class="btn">
+                    <a href="{% url 'edit_book' book.pk %}">Редактировать</a>
+                    <a href="{% url 'delete_book' book.pk %}">Удалить</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+            {% endif %}
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">последняя</a>
+            {% endif %}
+        </span>
+    </div>
+</body>
+</html>
