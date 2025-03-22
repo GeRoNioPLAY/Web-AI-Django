@@ -1,40 +1,43 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Список книг</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'books/styles.css' %}">
-</head>
-<body>
-    <h1>Список книг</h1>
-    <div class="add_btn">
-        <a href="{% url 'add_book' %}">Добавить новую книгу</a>
-    </div>
-    <ul>
-        {% for book in page_obj %}
-            <li>
-                {{ book.title }} от {{ book.author }}; Цена: {{ book.price }}.
-                <div class="btn">
+{% extends 'base.html' %}
+{% block title %}Список книг{% endblock %}
+{% block content %}
+<h1>Список книг</h1>
+<div class="add_btn">
+    {% if user.is_authenticated %}
+        <p>Здравствуйте, {{ user.username }}! <a href="{% url 'logout' %}">Выйти</a></p>
+        {% if user.role == 'user' or user.role == 'admin' %}
+            <a href="{% url 'add_book' %}">Добавить книгу</a>
+        {% endif %}
+    {% else %}
+<p><a href="{% url 'login' %}">Войти</a> | <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+    {% endif %}
+</div>
+<ul>
+    {% for book in page_obj %}
+        <li>
+            {{ book.title }} от {{ book.author }}; Цена: {{ book.price }}.
+            <div class="btn">
+                {% if user.role == 'admin' %}
                     <a href="{% url 'edit_book' book.pk %}">Редактировать</a>
                     <a href="{% url 'delete_book' book.pk %}">Удалить</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">первая</a>
-                <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
-            {% endif %}
-            <span class="current">
-                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
-            </span>
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">следующая</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">последняя</a>
-            {% endif %}
+                {% endif %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
         </span>
-    </div>
-</body>
-</html>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}
