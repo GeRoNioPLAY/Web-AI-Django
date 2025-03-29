@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<h2>Личный кабинет</h2>
+<form method="post">
+    {% csrf_token %}
+    {% csrf_token %}
+    <ul>
+    <div>
+        <li>
+        <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+            <span class="error">{{ form.username.errors }}</span>
+        {% endif %}
+        </li>
+    </div>
+    <div>
+        <li>
+            <label for="{{ form.email.id_for_label }}">Электронная почта:</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <span class="error">{{ form.email.errors }}</span>
+            {% endif %}
+        </li>
+    </div>
+    <div>
+        <li>
+            <label for="{{ form.first_name.id_for_label }}">Имя:</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+                <span class="error">{{ form.first_name.errors }}</span>
+            {% endif %}
+        </li>
+    </div>
+    <div>
+        <li>
+            <label for="{{ form.last_name.id_for_label }}">Фамилия:</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+                <span class="error">{{ form.last_name.errors }}</span>
+            {% endif %}
+        </li>
+    </div>
+    </ul>
+    <button type="submit">Сохранить изменения</button>
+</form>
+<p><a href="{% url 'list' %}">Вернуться к списку книг</a></p>
+{% endblock %}

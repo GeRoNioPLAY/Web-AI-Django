@@ -14,3 +14,13 @@ class UserLogin(AuthenticationForm):
         model = CustomUser
         fields = ("username", "password")
 
+class UserDataChange(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'first_name', 'last_name')
+        labels = {
+            'username': 'Имя пользователя',
+            'email': 'Почта',
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+        }

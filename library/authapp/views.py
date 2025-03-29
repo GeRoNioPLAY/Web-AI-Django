@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
-from .forms import UserRegistration, UserLogin
+from .forms import UserRegistration, UserLogin, UserDataChange
 
 def register(request):
     if request.method == 'POST':
@@ -27,4 +28,16 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('list')
+
+
+@login_required
+def account(request):
+    if request.method == 'POST':
+        form = UserDataChange(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('account')
+    else:
+        form = UserDataChange(instance=request.user)
+    return render(request, 'authapp/account.html', {'form': form})
 

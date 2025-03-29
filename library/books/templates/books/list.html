@@ -17,6 +17,9 @@
         <li>
             {{ book.title }} от {{ book.author }}; Цена: {{ book.price }}.
             <div class="btn">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_to_cart' book.pk %}">Положить в корзину</a>
+                {% endif %}
                 {% if user.role == 'admin' %}
                     <a href="{% url 'edit_book' book.pk %}">Редактировать</a>
                     <a href="{% url 'delete_book' book.pk %}">Удалить</a>

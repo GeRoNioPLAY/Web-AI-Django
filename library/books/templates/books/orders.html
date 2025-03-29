@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Мои заказы{% endblock %}
+{% block content %}
+<h2>Мои заказы</h2>
+{% if orders %}
+    <ul>
+        {% for order in orders %}
+            <li>
+                Заказ #{{ order.pk }} от {{ order.created_at }} - {{ order.total_price }} руб.
+                <ul>
+                    {% for item in order.items.all %}
+                        <li>{{ item.book.title }} - {{ item.quantity }} шт. - {{ item.price }} руб.</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас пока нет заказов.</p>
+{% endif %}
+<p><a href="{% url 'list' %}">Вернуться к списку книг</a></p>
+{% endblock %}
