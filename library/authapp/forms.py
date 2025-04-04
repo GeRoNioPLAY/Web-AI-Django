@@ -24,3 +24,22 @@ class UserDataChange(forms.ModelForm):
             'first_name': 'Имя',
             'last_name': 'Фамилия',
         }
+
+class RegisterForm(forms.Form):
+    username = forms.CharField(max_length=150, label='Имя пользователя')
+    email = forms.EmailField(label='Электронная почта')
+    password1 = forms.CharField(widget=forms.PasswordInput, label='Пароль')
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Подтверждение пароля')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Пароли не совпадают.')
+        return cleaned_data
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=150, label='Имя пользователя')
+    password = forms.CharField(widget=forms.PasswordInput, label='Пароль')

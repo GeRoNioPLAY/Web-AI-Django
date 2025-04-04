@@ -1,17 +1,37 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
-from .forms import UserRegistration, UserLogin, UserDataChange
+from .forms import UserRegistration, UserLogin, UserDataChange, RegisterForm
+from .models import CustomUser
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegistration(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             return redirect('list')
+#     else:
+#         form = UserRegistration()
+#     return render(request, 'authapp/register.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegistration(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('list')
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
+            user = CustomUser(username=username, email=email)
+            user = CustomUser(
+                username=username,
+                email=email,
+            )
+            user.set_password(password)
+            user.save()
+            return redirect('login')
     else:
-        form = UserRegistration()
+        form = RegisterForm()
     return render(request, 'authapp/register.html', {'form': form})
 
 def login_view(request):
