@@ -11,7 +11,15 @@
         {% endfor %}
     </ul>
     <p><strong>Общая стоимость:</strong> {{ total_price }} руб.</p>
-    <a href="{% url 'create_order' %}">Оформить заказ</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'create_order' %}">Оформить заказ</a>
+    {% else %}
+        <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оформить заказ.</p>
+    {% endif %}
+    <form action="{% url 'clear_cart' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Очистить корзину</button>
+    </form>
 {% else %}
     <p>Ваша корзина пуста.</p>
 {% endif %}

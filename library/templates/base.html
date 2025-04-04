@@ -13,8 +13,8 @@
         <h1>Библиотека</h1>
         <nav>
             <a href="{% url 'list' %}">Список книг</a>
+            <a href="{% url 'cart' %}">Корзина</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'cart' %}">Корзина</a>
                 <a href="{% url 'orders' %}">Мои заказы</a>
                 <a href="{% url 'account' %}">Личный кабинет</a>
             {% endif %}
