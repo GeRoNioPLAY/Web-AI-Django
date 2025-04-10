@@ -1,36 +1,72 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
 <h2>Создание нового аккаунта</h2>
-<form method="post">
+<form method="post" id="register-form">
     {% csrf_token %}
     <ul>
     <div>
         <li>
         <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
         {{ form.username }}
+        <span class="error" id="username-error"></span>
+        {% if form.username.errors %}
+            <span class="error">{{ form.username.errors }}</span>
+        {% endif %}
         </li>
     </div>
     <div>
         <li>
         <label for="{{ form.email.id_for_label }}">Электронная почта:</label>
         {{ form.email }}
+        <span class="error" id="email-error"></span>
+        {% if form.email.errors %}
+            <span class="error">{{ form.email.errors }}</span>
+        {% endif %}
         </li>
     </div>
     <div>
         <li>
             <label for="{{ form.password1.id_for_label }}">Пароль:</label>
             {{ form.password1 }}
+            <span class="error" id="password1-error"></span>
+            {% if form.password1.errors %}
+                <span class="error">{{ form.password1.errors }}</span>
+            {% endif %}
         </li>
     </div>
     <div>
         <li>
             <label for="{{ form.password2.id_for_label }}">Подтверждение пароля:</label>
             {{ form.password2 }}
+            <span class="error" id="password2-error"></span>
+            {% if form.password2.errors %}
+                <span class="error">{{ form.password2.errors }}</span>
+            {% endif %}
         </li>
     </div>
     </ul>
     <button type="submit">Создать аккаунт</button>
 </form>
 <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите в систему</a></p>
+
+<style>
+    .error {
+        color: red;
+        font-size: 0.9em;
+        display: block;
+    }
+    .success {
+        color: green;
+        font-size: 0.9em;
+        display: block;
+    }
+</style>
+
+<script>
+    const checkEmailUrl = "{% url 'check_email' %}";
+    const checkUsernameUrl = "{% url 'check_username' %}";
+</script>
+<script src="{% static 'authapp/js/register.js' %}"></script>
 {% endblock %}

@@ -12,7 +12,29 @@
 <p><a href="{% url 'login' %}">Войти</a> | <a href="{% url 'register' %}">Зарегистрироваться</a></p>
     {% endif %}
 </div>
-<ul>
+
+<form id="filter-form" class="filter-form">
+    <p>
+        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        {{ form.title }}
+    </p>
+    <p>
+        <label for="{{ form.author.id_for_label }}">{{ form.author.label }}</label>
+        {{ form.author }}
+    </p>
+    <p>
+        <label for="{{ form.price_min.id_for_label }}">{{ form.price_min.label }}</label>
+        {{ form.price_min }}
+    </p>
+    <p>
+        <label for="{{ form.price_max.id_for_label }}">{{ form.price_max.label }}</label>
+        {{ form.price_max }}
+    </p>
+    <button type="submit">Фильтровать</button>
+    <a href="{% url 'list' %}">Сбросить фильтры</a>
+</form>
+
+<ul id="book-list">
     {% for book in page_obj %}
         <li>
             {{ book.title }} от {{ book.author }}; Цена: {{ book.price }}.
@@ -24,9 +46,11 @@
                 {% endif %}
             </div>
         </li>
+    {% empty %}
+        <li>Книги не найдены.</li>
     {% endfor %}
 </ul>
-<div class="pagination">
+<div class="pagination" id="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1">первая</a>
@@ -41,4 +65,77 @@
         {% endif %}
     </span>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filter-form');
+        const bookList = document.getElementById('book-list');
+        const pagination = document.getElementById('pagination');
+    
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    
+        function updateBooks(params) {
+            fetch(`{% url 'list' %}?${params}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    bookList.innerHTML = '';
+    
+                    if (!data.books || data.books.length === 0) {
+                        bookList.innerHTML = '<li>Книги не найдены.</li>';
+                        console.log('Книги не найдены, добавлен текст');
+                    } else {
+                        data.books.forEach(book => {
+                            const li = document.createElement('li');
+                            li.setAttribute('data-book-id', book.pk);
+                            li.textContent = `${book.title} от ${book.author}; Цена: ${book.price}.`;
+                            bookList.appendChild(li);
+                        });
+                    }
+
+                    pagination.innerHTML = `Страница ${data.current_page} из ${data.num_pages}.`;
+                } catch (e) {
+                    throw new Error('Некорректный JSON в ответе');
+                }
+            })
+            .catch(error => {
+                bookList.innerHTML = '<li>Ошибка загрузки книг.</li>';
+            });
+        }
+    
+        filterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams(formData).toString();
+            updateBooks(params);
+        });
+    
+        const debouncedUpdateBooks = debounce(updateBooks, 500);
+        filterForm.addEventListener('input', function() {
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams(formData).toString();
+            debouncedUpdateBooks(params);
+        });
+    });
+</script>
 {% endblock %}

@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
@@ -49,6 +50,20 @@ def logout_view(request):
     logout(request)
     return redirect('list')
 
+def check_email(request):
+    email = request.GET.get('email', '')
+    exists = CustomUser.objects.filter(email=email).exists()
+    return JsonResponse({'exists': exists})
+
+def check_username(request):
+    try:
+        username = request.GET.get('username', '')
+        if not username:
+            return JsonResponse({'error': 'Имя пользователя не указано'}, status=400)
+        exists = CustomUser.objects.filter(username=username).exists()
+        return JsonResponse({'exists': exists})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 def account(request):

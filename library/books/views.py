@@ -2,24 +2,64 @@
 
 # Create your views here.
 import json
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Book
 from .models import Book, Order, OrderItem
-from .forms import BookForm
+from .forms import BookFilterForm, BookForm
 from django.core.paginator import Paginator
 
 def admin_required(login_url=None):
     return user_passes_test(lambda u: u.role == 'admin', login_url=login_url)
 
 def list(request):
-    books = Book.objects.all()
-    paginator = Paginator(books, 5)
+    books = Book.objects.all().order_by('id')
+
+    form = BookFilterForm(request.GET)
+    if form.is_valid():
+        title = form.cleaned_data['title']
+        author = form.cleaned_data['author']
+        price_min = form.cleaned_data['price_min']
+        price_max = form.cleaned_data['price_max']
+
+        if title:
+            books = books.filter(title__icontains=title)
+        if author:
+            books = books.filter(author=author)
+        if price_min is not None:
+            books = books.filter(price__gte=price_min)
+        if price_max is not None:
+            books = books.filter(price__lte=price_max)
+
+    paginator = Paginator(books, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'books/list.html', {'page_obj': page_obj})
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        books_data = [
+            {
+                'title': book.title,
+                'author': book.author,
+                'price': str(book.price),
+                'pk': book.pk,
+                'can_edit': request.user.is_authenticated and request.user.role == 'admin',
+            }
+            for book in page_obj
+        ]
+        print(f"Возвращаемые книги: {books_data}")
+        return JsonResponse({
+            'books': books_data,
+            'has_previous': page_obj.has_previous(),
+            'has_next': page_obj.has_next(),
+            'previous_page_number': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+            'current_page': page_obj.number,
+            'num_pages': page_obj.paginator.num_pages,
+        })
+
+    return render(request, 'books/list.html', {'page_obj': page_obj, 'form': form})
 
 
 @login_required
