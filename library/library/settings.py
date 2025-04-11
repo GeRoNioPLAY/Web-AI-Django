@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-wi6**f%$1!_b9c2-4!=9t#lip38t$0-@d+e1yt-jt-si*$8wd*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*'] # Для Docker
+ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*'] # Для Docker
 
 # Application definition
 
@@ -75,23 +75,23 @@ WSGI_APPLICATION = 'library.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'library',
-#         'USER': 'postgres',
-#         'PASSWORD': '345223416987',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'library',
+        'USER': 'postgres',
+        'PASSWORD': '345223416987',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
-} # Для Docker
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# } # Для Docker
 
 AUTH_USER_MODEL = 'authapp.CustomUser'
 
